@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <style type="text/css">
+        .el-header,
+        .el-footer {
+            /* color: #333; */
+            text-align: center;
+            line-height: 120px;
+        }
+
+        .input {
+            height: 23px;
+            border: 1px solid #ccc;
+            padding: 7px 0px;
+            border-radius: 3px;
+            padding-left: 5px;
+            -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+            -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+            -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+            transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s
+        }
+
+        .input:focus {
+            border-color: #66afe9;
+            outline: 0;
+            -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6)
+        }
+
+        .el-aside {
+            /* background-color: #D3DCE6; */
+            /* color: #333; */
+            text-align: center;
+            line-height: 100px;
+            height: 610.7px;
+        }
+
+        .el-main {
+            /* background-color: #E9EEF3; */
+            /* color: #333; */
+            line-height: 80px;
+
+        }
+
+        .el-menu {
+            height: 500px;
+            margin-left: 35px;
+            margin-top: 35px;
+            width: 240px;
+        }
+
+        body > .el-container {
+            margin-bottom: 0px;
+        }
+
+        .el-container:nth-child(5) .el-aside,
+        .el-container:nth-child(6) .el-aside {
+            line-height: 30px;
+        }
+
+        .el-container:nth-child(7) .el-aside {
+            line-height: 20px;
+        }
+
+        .el-table {
+            /* opacity:1; */
+            filter: alpha(opacity=40);
+        }
+
+        body {
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body
+        style="background-image: url(img/2.jpg);background-repeat:no-repeat;background-size: cover;width: 100%;height: 100%;overflow-x: hidden;overflow-y: hidden;">
+<div id="app">
+    <el-container>
+        <el-header height="150px">
+        </el-header>
+        <el-container>
+            <el-row class="tac">
+                <el-col :span="12">
+                    <el-menu
+                            default-active="2"
+                            class="el-menu-vertical-demo">
+                        <el-menu-item index="1" @click="bookManage">
+                            <i class="el-icon-menu"></i>
+                            <span slot="title">图书管理</span>
+                        </el-menu-item>
+                        <el-menu-item index="2">
+                            <i class="el-icon-document"></i>
+                            <span slot="title">人员管理</span>
+                        </el-menu-item>
+                    </el-menu>
+                </el-col>
+            </el-row>
+
+
+            <el-main>
+                <el-row>
+                    <el-button round @click="dialogFormVisible_pwd = true">修改密码</el-button>
+                    <el-dialog title="修改密码" :visible.sync="dialogFormVisible_pwd">
+                        <el-form :model="form_pwd">
+                            <el-form-item label="旧密码" :label-width="formLabelWidth">
+                                <el-input type="password" v-model="form_pwd.oldPwd" autocomplete="off"></el-input>
+                            </el-form-item>
+                            <el-form-item label="新密码" :label-width="formLabelWidth">
+                                <el-input type="password" v-model="form_pwd.newPwd" autocomplete="off"></el-input>
+                            </el-form-item>
+                            <el-form-item :label-width="formLabelWidth">
+                                <el-input v-model="form_pwd.newPwdAgain"
+                                          type="password"
+                                          placeholder="请再一次输入新的密码"
+                                          autocomplete="off"></el-input>
+                            </el-form-item>
+                        </el-form>
+                        <div slot="footer" class="dialog-footer">
+                            <el-button @click="dialogFormVisible_pwd = false">取 消</el-button>
+                            <el-button @click="modifyPwd">确 定</el-button>
+                        </div>
+                    </el-dialog>
+
+                    <!--退出登录-->
+                    <el-button round @click="getOut">退出登录</el-button>
+                </el-row>
+
+                <!-- 查询 -->
+                <span style="width:10px;margin:0; auto;">
+							<input class='input' type="text" v-model="inputName"/>
+							<el-button @click="checkUser" icon="el-icon-search">搜索</el-button>
+                </span>
+
+                <!-- 编辑的弹出对话框 -->
+                <el-dialog title="修改员工信息" :visible.sync="dialogFormVisible_mod">
+                    <el-form :model="form">
+                        <el-form-item label="员工名字" :label-width="formLabelWidth">
+                            <el-input v-model="form.name" autocomplete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="员工性别" :label-width="formLabelWidth">
+                            <el-input v-model="form.sex" autocomplete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="员工电话" :label-width="formLabelWidth">
+                            <el-input v-model="form.phone"
+                                      placeholder="请输入11位的电话号码"
+                                      maxlength="11"
+                                      show-word-limit
+                                      autocomplete="off"></el-input>
+                        </el-form-item>
+                    </el-form>
+                    <div slot="footer" class="dialog-footer">
+                        <el-button @click="dialogFormVisible_mod = false">取 消</el-button>
+                        <el-button @click="doModify">确 定</el-button>
+                    </div>
+                </el-dialog>
+
+                <!-- 新增的对话框 -->
+                <el-button icon="el-icon-edit" @click="dialogFormVisible_add = true">新增</el-button>
+                <el-dialog title="员工新增" :visible.sync="dialogFormVisible_add">
+                    <el-form :model="form_add">
+                        <el-form-item label="员工名字" :label-width="formLabelWidth">
+                            <el-input v-model="form_add.name" autocomplete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="员工性别" :label-width="formLabelWidth">
+                            <el-input v-model="form_add.sex" autocomplete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="员工电话" :label-width="formLabelWidth">
+                            <el-input v-model="form_add.phone" autocomplete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="员工账号" :label-width="formLabelWidth">
+                            <el-input v-model="form_add.account" autocomplete="off"></el-input>
+                        </el-form-item>
+                    </el-form>
+                    <div slot="footer" class="dialog-footer">
+                        <el-button @click="dialogFormVisible_add = false">取 消</el-button>
+                        <el-button @click="addUser">确 定</el-button>
+                    </div>
+                </el-dialog>
+
+
+                <el-table :data="messages" border style="width: 100% " bgcolor="transparent">
+                    <el-table-column prop="userId" label="员工编号" width="120">
+                    </el-table-column>
+                    <el-table-column prop="userName" label="员工名字" width="120">
+                    </el-table-column>
+                    <el-table-column prop="userSex" label="员工性别" width="120">
+                    </el-table-column>
+                    <el-table-column prop="userPhone" label="员工电话" width="120">
+                    </el-table-column>
+                    <el-table-column prop="userAccount" label="员工账号" width="120">
+                    </el-table-column>
+                    <el-table-column label="操作" width="350">
+                        <template slot-scope="scope">
+                            <el-tooltip class="item" effect="dark" content="有借阅关系的员工不可删除" placement="left">
+                                <el-button @click="delMessage(scope.row)" type="text" size="small"
+                                           :disabled="scope.row.returnById > 0"
+                                >删除
+                                </el-button>
+                            </el-tooltip>
+                            <el-button type="text" size="small" @click="modifyUser(scope.row)">编辑</el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+
+                <!-- 分页 -->
+                <div class="page">
+                    <el-pagination background :page-size="page.rn" :current-page="page.pn"
+                                   layout="prev, pager, next" :total="page.total" @current-change="pageChange">
+                    </el-pagination>
+                </div>
+            </el-main>
+        </el-container>
+
+    </el-container>
+</div>
+
+</body>
+<!-- import Vue before Element -->
+<script src="js/vue.js"></script>
+<!-- 引入组件库 -->
+<script src="element-ui/lib/index.js"></script>
+<link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
+<script src="js/axios.min.js" type="text/javascript" charset="utf-8"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            // 用于新增数据的dialog变量
+            dialogFormVisible_add: false,
+            form_add: {
+                name: '',
+                sex: '',
+                phone: '',
+                account: ''
+            },
+
+            // 用于修改数据的dialog变量
+            dialogFormVisible_mod: false,
+            form: {
+                id: '',
+                name: '',
+                sex: '',
+                phone: '',
+                account: ''
+            },
+
+            //用于修改密码的dialog变量
+            dialogFormVisible_pwd: false,
+            form_pwd: {
+                account: '',
+                oldPwd: '',
+                newPwd: '',
+                newPwdAgain: ''
+            },
+
+            formLabelWidth: '120px', // 设置对话框的宽度
+            checkOk: '',
+            inputName: '',
+            bookName: '',
+            currUser: null,
+            messages: [],
+            page: {
+                pn: 1, //pagenumber
+                rn: 5, //rownumber
+                total: 100
+            }
+        },
+        methods: {
+            pageChange(num) {
+                this.page.pn = num;
+                this.loadMessage();
+            },
+            loadMessage() {
+                axios.request({
+                    url: 'http://localhost:8083/bms',
+                    params: {
+                        type: false,
+                        pn: this.page.pn,
+                        rn: this.page.rn
+                    }
+                }).then((res) => {
+                    this.page.total = res.data.total;
+                    this.messages = res.data.messages;
+                })
+            },
+
+            checkUser() {
+                axios.request({
+                    url: 'http://localhost:8083/bms/query',
+                    params: {
+                        type: false,
+                        pn: this.page.pn,
+                        rn: this.page.rn,
+                        inputName: this.inputName
+                    },
+                }).then((res) => {
+                    this.messages = res.data.listByName;
+                    this.page.total = res.data.total;
+                })
+            },
+
+
+            addUser() {
+                axios.request({
+                    url: 'http://localhost:8083/bms/add',
+                    params: {
+                        type: false,
+                        pn: this.page.pn,
+                        rn: this.page.rn,
+                        addUserName: this.form_add.name,
+                        addUserSex: this.form_add.sex,
+                        addUserPhone: this.form_add.phone,
+                        addUserAccount: this.form_add.account,
+                    },
+                }).then((res) => {
+                    this.checkOk = res.data.checkOK;
+                    if (this.checkOk) {
+                        this.$message.success('新增员工成功');
+                    } else {
+                        this.$message.error('新增员工失败')
+                    }
+                    this.loadMessage()
+                })
+                this.form_add.name = "";
+                this.form_add.sex = "";
+                this.form_add.phone = "";
+                this.form_add.account = "";
+                this.dialogFormVisible_add = false;
+            },
+
+            // 删除员工
+            delMessage(row) {
+                this.$confirm('是否删除员工信息, 是否继续?', '提示', {
+                    confirmButtonText: '删除', //确定按钮的文字
+                    cancelButtonText: '取消', //取消按钮文字
+                    type: 'warning' //图标类型
+                }).then(() => { //确定按钮的执行代码
+                    axios.request({
+                        url: 'http://localhost:8083/bms/del',
+                        params: {
+                            type: false,
+                            userName: row.userName
+                        }
+                    }).then((res) => {
+                        this.checkOk = res.data.checkOK;
+                        if (this.checkOk) {
+                            this.$message.success('删除成功');
+                        } else {
+                            this.$message.error('删除失败')
+                        }
+                        this.loadMessage()
+                    })
+                }).catch(() => { //取消按钮的执行代码
+                });
+            },
+
+            // 实际修改
+            doModify() {
+                axios.request({
+                    url: 'http://localhost:8083/bms/mod',
+                    params: {
+                        type: false,
+                        mod_id: this.form.id,
+                        mod_name: this.form.name,
+                        mod_sex: this.form.sex,
+                        mod_phone: this.form.phone,
+                    },
+                }).then((res) => {
+                    this.checkOk = res.data.checkOK;
+                    if (this.checkOk) {
+                        this.$message.success('编辑成功');
+                    } else {
+                        this.$message.error('编辑失败');
+                    }
+                    this.loadMessage();
+                })
+                this.loadMessage();
+                this.dialogFormVisible_mod = false;
+            },
+
+            // 修改员工信息
+            modifyUser(row) {
+                this.dialogFormVisible_mod = true;
+                this.form.id = row.userId;
+                this.form.name = row.userName;
+                this.form.sex = row.userSex;
+                this.form.phone = row.userPhone;
+            },
+
+            //图书管理页面
+            bookManage() {
+                if (JSON.parse(sessionStorage.getItem('loginUser'))) {
+                    window.location = "bookM.html";
+                }
+            },
+
+            //退出登录
+            getOut() {
+                sessionStorage.removeItem('loginUser');
+                window.location = "http://localhost:8083/login.html";
+            },
+
+            //修改密码
+            modifyPwd() {
+                if (JSON.parse(sessionStorage.getItem('loginUser')).password == this.form_pwd.oldPwd) {
+                    if (this.form_pwd.newPwd == this.form_pwd.newPwdAgain) {
+                        axios.request({
+                            url: 'http://localhost:8083/bms/modPwd',
+                            params: {
+                                mod_account: JSON.parse(sessionStorage.getItem('loginUser')).account,
+                                mod_pwd: this.form_pwd.newPwd
+                            },
+                        }).then((res) => {
+                            this.checkOk = res.data.checkOK;
+                            if (this.checkOk) {
+                                this.$message.success('修改成功, 将自动跳转到登录页面');
+                                this.sleep(2000);
+                                this.getOut();
+                            } else {
+                                this.$message.error('修改失败');
+                                this.loadMessage();
+                            }
+                        })
+                        this.loadMessage();
+                        this.dialogFormVisible_mod = false;
+                    } else {
+                        this.$message.error("新密码两次输入不一致，请重新输入");
+                    }
+                } else {
+                    this.$message.error("旧密码不对，请重新输入");
+                }
+            },
+
+            //暂停函数
+            sleep(time) {
+                for (var t = Date.now(); Date.now() - t <= time;) ;
+            }
+        },
+
+        created() {
+            if (JSON.parse(sessionStorage.getItem('loginUser'))) {
+                if (JSON.parse(sessionStorage.getItem('loginUser')).account == "admin") {
+                    this.loadMessage();
+                } else {
+                    window.location.href = "bookM.html";
+                }
+            } else {
+                window.location.href = "bookM.html";
+            }
+        }
+    });
+</script>
+
+</html>

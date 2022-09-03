@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <style type="text/css">
+        .el-header,
+        .el-footer {
+            /* color: #333; */
+            text-align: center;
+            line-height: 120px;
+        }
+
+        .input {
+            height: 23px;
+            border: 1px solid #ccc;
+            padding: 7px 0px;
+            border-radius: 3px;
+            padding-left: 5px;
+            -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+            -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+            -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+            transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s
+        }
+
+        .input:focus {
+            border-color: #66afe9;
+            outline: 0;
+            -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6)
+        }
+
+        .el-aside {
+            /* background-color: #D3DCE6; */
+            /* color: #333; */
+            text-align: center;
+            line-height: 100px;
+            height: 610.7px;
+        }
+
+        .el-main {
+            /* background-color: #E9EEF3; */
+            /* color: #333; */
+            line-height: 80px;
+
+        }
+
+        .el-menu {
+            height: 500px;
+            margin-left: 35px;
+            margin-top: 35px;
+            width: 240px;
+        }
+
+        body > .el-container {
+            margin-bottom: 0px;
+        }
+
+        .el-container:nth-child(5) .el-aside,
+        .el-container:nth-child(6) .el-aside {
+            line-height: 30px;
+        }
+
+        .el-container:nth-child(7) .el-aside {
+            line-height: 20px;
+        }
+
+        .el-table {
+            /* opacity:1; */
+            filter: alpha(opacity=40);
+        }
+
+        body {
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body
+        style="background-image: url(img/2.jpg);background-repeat:no-repeat;background-size: cover;width: 100%;height: 100%;overflow-x: hidden;overflow-y: hidden;">
+<div id="app">
+    <el-container>
+        <el-header height="150px">
+        </el-header>
+        <el-container>
+            <el-row class="tac">
+                <el-col :span="12">
+                    <el-menu
+                            default-active="1"
+                            class="el-menu-vertical-demo">
+                        <el-menu-item index="1">
+                            <i class="el-icon-menu"></i>
+                            <span slot="title">图书管理</span>
+                        </el-menu-item>
+                        <el-menu-item index="2" :disabled="disabled" @click="userManage">
+                            <i class="el-icon-document"></i>
+                            <span slot="title">人员管理</span>
+                        </el-menu-item>
+                    </el-menu>
+                </el-col>
+            </el-row>
+
+
+            <!-- 图书归还-->
+            <el-dialog title="图书归还" :visible.sync="dialogFormVisible_ret">
+                <template>
+                    <el-input-number v-model="form_ret.returnNumber"
+                                     :min="1"
+                                     :max="form_ret.borrowNumber"
+                                     label="归还数目">
+                    </el-input-number>
+                </template>
+                <div slot="footer" class="dialog-footer">
+                    <el-button @click="dialogFormVisible_ret = false">取 消</el-button>
+                    <el-button @click="returnM">确 定</el-button>
+                </div>
+            </el-dialog>
+
+
+            <!-- 图书借阅-->
+            <el-dialog title="图书借阅" :visible.sync="dialogFormVisible_bor">
+                <template>
+                    <el-input-number v-model="form_bor.borrowNumber"
+                                     :min="1"
+                                     :max="form_bor.nowNumber"
+                                     label="借阅数目">
+                    </el-input-number>
+                </template>
+                <div slot="footer" class="dialog-footer">
+                    <el-button @click="dialogFormVisible_bor = false">取 消</el-button>
+                    <el-button @click="borrowM">确 定</el-button>
+                </div>
+            </el-dialog>
+
+
+            <!--修改密码-->
+            <el-main>
+                <el-row>
+                    <el-button round @click="dialogFormVisible_pwd = true">修改密码</el-button>
+                    <el-dialog title="修改密码" :visible.sync="dialogFormVisible_pwd">
+                        <el-form :model="form_pwd">
+                            <el-form-item label="旧密码" :label-width="formLabelWidth">
+                                <el-input type="password" v-model="form_pwd.oldPwd" autocomplete="off"></el-input>
+                            </el-form-item>
+                            <el-form-item label="新密码" :label-width="formLabelWidth">
+                                <el-input type="password" v-model="form_pwd.newPwd" autocomplete="off"></el-input>
+                            </el-form-item>
+                            <el-form-item :label-width="formLabelWidth">
+                                <el-input v-model="form_pwd.newPwdAgain"
+                                          type="password"
+                                          placeholder="请再一次输入新的密码"
+                                          autocomplete="off"></el-input>
+                            </el-form-item>
+                        </el-form>
+                        <div slot="footer" class="dialog-footer">
+                            <el-button @click="dialogFormVisible_pwd = false">取 消</el-button>
+                            <el-button @click="modifyPwd">确 定</el-button>
+                        </div>
+                    </el-dialog>
+
+                    <!--退出登录-->
+                    <el-button round @click="getOut">退出登录</el-button>
+                </el-row>
+
+
+                <!-- 查询 -->
+                <span style="width:10px;margin:0; auto;">
+                    <input class='input' type="text" v-model="inputName"/>
+                    <el-button @click="checkBook" icon="el-icon-search">搜索</el-button>
+                </span>
+
+                <!-- 编辑的弹出对话框 -->
+                <el-dialog title="修改图书" :visible.sync="dialogFormVisible_mod">
+                    <el-form :model="form">
+                        <el-form-item label="书籍名称" :label-width="formLabelWidth">
+                            <el-input v-model="form.name" autocomplete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="书籍作者" :label-width="formLabelWidth">
+                            <el-input v-model="form.author" autocomplete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="出版社" :label-width="formLabelWidth">
+                            <el-input v-model="form.type" autocomplete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="书籍ISBN" :label-width="formLabelWidth">
+                            <el-input v-model="form.ISBN" autocomplete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="书籍价格" :label-width="formLabelWidth">
+                            <el-input v-model="form.price" autocomplete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="书籍总数" :label-width="formLabelWidth">
+                            <el-input v-model="form.BeginNumber" autocomplete="off"></el-input>
+                        </el-form-item>
+                    </el-form>
+                    <div slot="footer" class="dialog-footer">
+                        <el-button @click="dialogFormVisible_mod = false">取 消</el-button>
+                        <el-button @click="doModify">确 定</el-button>
+                    </div>
+                </el-dialog>
+
+                <!-- 新增的对话框 -->
+                <el-button icon="el-icon-edit" @click="dialogFormVisible_add = true">新增</el-button>
+                <el-dialog title="图书新增" :visible.sync="dialogFormVisible_add">
+                    <el-form :model="form_add">
+                        <el-form-item label="书籍名称" :label-width="formLabelWidth">
+                            <el-input v-model="form_add.name" autocomplete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="书籍作者" :label-width="formLabelWidth">
+                            <el-input v-model="form_add.author" autocomplete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="书籍类型" :label-width="formLabelWidth">
+                            <el-input v-model="form_add.type" autocomplete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="书籍ISBN号" :label-width="formLabelWidth">
+                            <el-input v-model="form_add.ISBN" autocomplete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="书籍价格" :label-width="formLabelWidth">
+                            <el-input v-model="form_add.price" autocomplete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="书籍总量" :label-width="formLabelWidth">
+                            <el-input v-model="form_add.BeginNumber" autocomplete="off"></el-input>
+                        </el-form-item>
+                    </el-form>
+                    <div slot="footer" class="dialog-footer">
+                        <el-button @click="dialogFormVisible_add = false">取 消</el-button>
+                        <el-button @click="addBook">确 定</el-button>
+                    </div>
+                </el-dialog>
+
+
+                <el-table :data="messages" border style="width: 100% " bgcolor="transparent">
+                    <el-table-column prop="bookId" label="书籍编号" width="120">
+                    </el-table-column>
+                    <el-table-column prop="bookName" label="书籍名称" width="120">
+                    </el-table-column>
+                    <el-table-column prop="bookAuthor" label="书籍作者" width="120">
+                    </el-table-column>
+                    <el-table-column prop="bookType" label="书籍类型" width="120">
+                    </el-table-column>
+                    <el-table-column prop="bookISBN" label="书籍ISBN号" width="120">
+                    </el-table-column>
+                    <el-table-column prop="bookPrice" label="书籍价格" width="120">
+                    </el-table-column>
+                    <el-table-column prop="bookNowNumber" label="书籍在馆数" width="120">
+                    </el-table-column>
+                    <el-table-column prop="bookBeginNumber" label="书籍总数" width="120">
+                    </el-table-column>
+                    <el-table-column label="操作" width="350">
+                        <template slot-scope="scope">
+                            <el-tooltip class="item" effect="dark" content="有借阅关系的图书不可删除" placement="left">
+                                <el-button @click="delMessage(scope.row)"
+                                           :disabled="scope.row.borrowByBookId > 0"
+                                           type="text" size="small">删除
+                                </el-button>
+                            </el-tooltip>
+                            <el-button type="text" size="small" @click="modifyBook(scope.$index, scope.row)">编辑
+                            </el-button>
+                            <el-button @click="openBorrowDialog(scope.row)" type="text" size="small"
+                                       :disabled="scope.row.bookNowNumber == 0">
+                                借阅
+                            </el-button>
+                            <el-button @click="openReturnDialog(scope.row)" type="text" size="small"
+                                       :disabled="scope.row.borrowByBookId == 0">
+                                归还
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+
+                <!-- 分页 -->
+                <div class="page">
+                    <el-pagination background :page-size="page.rn" :current-page="page.pn"
+                                   layout="prev, pager, next" :total="page.total" @current-change="pageChange">
+                    </el-pagination>
+                </div>
+            </el-main>
+        </el-container>
+
+    </el-container>
+</div>
+
+</body>
+<!-- import Vue before Element -->
+<script src="js/vue.js"></script>
+<!-- 引入组件库 -->
+<script src="element-ui/lib/index.js"></script>
+<link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
+<script src="js/axios.min.js" type="text/javascript" charset="utf-8"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            // 用于新增数据的dialog变量
+            dialogFormVisible_add: false,
+            form_add: {
+                name: '',
+                author: '',
+                type: '',
+                ISBN: '',
+                price: '',
+                BeginNumber: ''
+            },
+
+            // 用于修改数据的dialog变量
+            dialogFormVisible_mod: false,
+            form: {
+                id: '',
+                name: '',
+                author: '',
+                type: '',
+                ISBN: '',
+                price: '',
+                BeginNumber: ''
+            },
+
+            //用于修改密码的dialog变量
+            dialogFormVisible_pwd: false,
+            form_pwd: {
+                account: '',
+                oldPwd: '',
+                newPwd: '',
+                newPwdAgain: ''
+            },
+
+            //用于借阅功能的dialog变量
+            dialogFormVisible_bor: false,
+            form_bor: {
+                nowNumber: '',
+                borrowNumber: 1
+            },
+
+            //用于归还功能的dialog变量
+            dialogFormVisible_ret: false,
+            form_ret: {
+                returnNumber: 1,
+                borrowNumber: '',
+                bookId: '',
+                nowNumber: ''
+            },
+            disabled: '',
+            formLabelWidth: '120px', // 设置对话框的宽度
+            formLabelWidth2: '30px', // 设置对话框的宽度
+            checkOk: '',
+            inputName: '',
+            bookName: '',
+            currUser: null,
+            messages: [],
+            page: {
+                pn: 1, //pagenumber
+                rn: 5, //rownumber
+                total: 100
+            }
+        },
+        methods: {
+            pageChange(num) {
+                this.page.pn = num;
+                this.loadMessage();
+            },
+            // 显示图书：加载数据
+            loadMessage() {
+                axios.request({
+                    url: 'http://localhost:8083/bms',
+                    params: {
+                        type: true,
+                        pn: this.page.pn,
+                        rn: this.page.rn
+                    }
+                }).then((res) => {
+                    this.page.total = res.data.total;
+                    this.messages = res.data.messages;
+                })
+            },
+            // 查询图书
+            checkBook() {
+                axios.request({
+                    url: 'http://localhost:8083/bms/query',
+                    params: {
+                        type: true,
+                        pn: this.page.pn,
+                        rn: this.page.rn,
+                        inputName: this.inputName
+                    },
+                }).then((res) => {
+                    this.messages = res.data.listByName;
+                    this.page.total = res.data.total;
+                })
+            },
+
+            // 新增图书
+            addBook() {
+                axios.request({
+                    url: 'http://localhost:8083/bms/add',
+                    params: {
+                        type: true,
+                        pn: this.page.pn,
+                        rn: this.page.rn,
+                        addBookName: this.form_add.name,
+                        addBookAuthor: this.form_add.author,
+                        addBookType: this.form_add.type,
+                        addBookISBN: this.form_add.ISBN,
+                        addBookPrice: this.form_add.price,
+                        addBookBeginNumber: this.form_add.BeginNumber,
+                    },
+                }).then((res) => {
+                    this.checkOk = res.data.checkOK;
+                    if (this.checkOk) {
+                        this.$message.success('新增图书成功');
+                    } else {
+                        this.$message.error('新增图书失败')
+                    }
+                    this.loadMessage()
+                })
+                this.form_add.name = "";
+                this.form_add.author = "";
+                this.form_add.type = "";
+                this.form_add.ISBN = "";
+                this.form_add.price = "";
+                this.form_add.BeginNumber = "";
+                this.dialogFormVisible_add = false;
+            },
+            // 删除图书
+            delMessage(row) {
+                this.$confirm('是否删除图书信息, 是否继续?', '提示', {
+                    confirmButtonText: '删除', //确定按钮的文字
+                    cancelButtonText: '取消', //取消按钮文字
+                    type: 'warning' //图标类型
+                }).then(() => { //确定按钮的执行代码
+                    axios.request({
+                        url: 'http://localhost:8083/bms/del',
+                        params: {
+                            type: true,
+                            Id: row.bookId,
+                        }
+                    }).then((res) => {
+                        this.checkOk = res.data.checkOK;
+                        if (this.checkOk) {
+                            this.$message.success('删除成功');
+                        } else {
+                            this.$message.error('删除失败')
+                        }
+                        this.loadMessage()
+                    })
+                }).catch(() => { //取消按钮的执行代码
+                });
+            },
+            // 实际修改
+            doModify() {
+                axios.request({
+                    url: 'http://localhost:8083/bms/mod',
+                    params: {
+                        type: true,
+                        mod_id: this.form.id,
+                        mod_name: this.form.name,
+                        mod_author: this.form.author,
+                        mod_type: this.form.type,
+                        mod_ISBN: this.form.ISBN,
+                        mod_price: this.form.price,
+                        mod_BeginNumber: this.form.BeginNumber
+                    },
+                }).then((res) => {
+                    this.checkOk = res.data.checkOK;
+                    if (this.checkOk) {
+                        this.$message.success('编辑成功');
+                    } else {
+                        this.$message.error('编辑失败');
+                    }
+                    this.loadMessage();
+                })
+                this.loadMessage();
+                this.dialogFormVisible_mod = false;
+            },
+
+            // 修改图书
+            modifyBook(index, row) {
+                this.dialogFormVisible_mod = true;
+                this.form.id = row.bookId;
+                this.form.name = row.bookName;
+                this.form.author = row.bookAuthor;
+                this.form.type = row.bookType;
+                this.form.ISBN = row.bookISBN;
+                this.form.price = row.bookPrice;
+                this.form.BeginNumber = row.bookBeginNumber;
+            },
+
+
+            //人员管理页面
+            userManage() {
+                window.location = "userM.html";
+            },
+
+            //退出登录
+            getOut() {
+                sessionStorage.removeItem('loginUser');
+                window.location = "login.html";
+            },
+
+            //修改密码
+            modifyPwd() {
+                if (JSON.parse(sessionStorage.getItem('loginUser')).password == this.form_pwd.oldPwd) {
+                    if (this.form_pwd.newPwd === this.form_pwd.newPwdAgain) {
+                        axios.request({
+                            url: 'http://localhost:8083/bms/modPwd',
+                            params: {
+                                mod_account: JSON.parse(sessionStorage.getItem('loginUser')).account,
+                                mod_pwd: this.form_pwd.newPwd
+                            },
+                        }).then((res) => {
+                            this.checkOk = res.data.checkOK;
+                            if (this.checkOk) {
+                                this.$message.success('修改成功, 将自动跳转到登录页面');
+                                this.sleep(2000);
+                                this.getOut();
+                            } else {
+                                this.$message.error('修改失败');
+                                this.loadMessage();
+                            }
+                        })
+                        this.loadMessage();
+                        this.dialogFormVisible_pwd = false;
+                    } else {
+                        this.$message.error("新密码两次输入不一致，请重新输入");
+                    }
+                } else {
+                    this.$message.error("旧密码不对，请重新输入");
+                }
+            },
+
+            //暂停函数
+            sleep(time) {
+                for (var t = Date.now(); Date.now() - t <= time;) ;
+            },
+
+            //实际借阅功能
+            borrowM() {
+                axios.request({
+                    url: 'http://localhost:8083/bms/borrow',
+                    params: {
+                        borrow_userId: JSON.parse(sessionStorage.getItem('loginUser')).id,
+                        borrow_bookId: this.form_bor.bookId,
+                        borrow_number: this.form_bor.borrowNumber
+                    },
+                }).then((res) => {
+                    this.checkOk = res.data.checkOK;
+                    if (this.checkOk) {
+                        this.$message.success('借阅成功');
+                        this.loadMessage();
+                    } else {
+                        this.$message.error('借阅失败');
+                        this.loadMessage();
+                    }
+                })
+                this.loadMessage();
+                this.dialogFormVisible_bor = false;
+            },
+
+            //打开借阅对话框
+            openBorrowDialog(row) {
+                this.dialogFormVisible_bor = true;
+                this.form_bor.borrowNumber = 1;
+                this.form_bor.bookId = row.bookId;
+                this.form_bor.nowNumber = row.bookNowNumber;
+            },
+
+            //实际归还功能
+            returnM() {
+                axios.request({
+                    url: 'http://localhost:8083/bms/return',
+                    params: {
+                        return_userId: JSON.parse(sessionStorage.getItem('loginUser')).id,
+                        return_bookId: this.form_ret.bookId,
+                        return_number: this.form_ret.returnNumber
+                    },
+                }).then((res) => {
+                    this.checkOk = res.data.checkOK;
+                    if (this.checkOk) {
+                        this.$message.success('归还成功');
+                        this.loadMessage();
+                    } else {
+                        this.$message.error('归还失败');
+                        this.loadMessage();
+                    }
+                })
+                this.loadMessage();
+                this.dialogFormVisible_ret = false;
+            },
+
+            //打开归还对话框()
+            openReturnDialog(row) {
+                this.dialogFormVisible_ret = true;
+                this.form_ret.returnNumber = 1;
+                this.form_ret.bookId = row.bookId;
+                this.form_ret.borrowNumber = row.borrowByBookId;
+            }
+
+        },
+        created() {
+            if (JSON.parse(sessionStorage.getItem('loginUser'))) {
+                this.loadMessage();
+                this.disabled = JSON.parse(sessionStorage.getItem('loginUser')).account != "admin";
+            } else {
+                window.location.href = "login.html";
+            }
+        }
+    });
+</script>
+
+</html>
