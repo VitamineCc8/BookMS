@@ -238,7 +238,7 @@
                     </el-table-column>
                     <el-table-column prop="bookType" label="书籍类型" width="120">
                     </el-table-column>
-                    <el-table-column prop="bookISBN" label="书籍ISBN号" width="120">
+                    <el-table-column prop="bookISBN" label="书籍ISBN号" width="140">
                     </el-table-column>
                     <el-table-column prop="bookPrice" label="书籍价格" width="120">
                     </el-table-column>
@@ -340,7 +340,6 @@
             },
             disabled: '',
             formLabelWidth: '120px', // 设置对话框的宽度
-            formLabelWidth2: '30px', // 设置对话框的宽度
             checkOk: '',
             inputName: '',
             bookName: '',
@@ -460,9 +459,13 @@
                     },
                 }).then((res) => {
                     this.checkOk = res.data.checkOK;
-                    if (this.checkOk) {
+                    if (this.checkOk > 0) {
                         this.$message.success('编辑成功');
-                    } else {
+                    }
+                    if (this.checkOk == -1) {
+                        this.$message.warning("编辑失败,书籍总数不能少于被借阅数")
+                    }
+                    if (this.checkOk == 0) {
                         this.$message.error('编辑失败');
                     }
                     this.loadMessage();

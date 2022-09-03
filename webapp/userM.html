@@ -370,6 +370,7 @@
                         mod_name: this.form.name,
                         mod_sex: this.form.sex,
                         mod_phone: this.form.phone,
+                        mod_account: this.form.account
                     },
                 }).then((res) => {
                     this.checkOk = res.data.checkOK;
@@ -391,6 +392,7 @@
                 this.form.name = row.userName;
                 this.form.sex = row.userSex;
                 this.form.phone = row.userPhone;
+                this.form.account = row.userAccount;
             },
 
             //图书管理页面
