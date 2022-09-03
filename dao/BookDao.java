@@ -22,7 +22,7 @@ public class BookDao {
 
 
     // 根据页数和书名进行获取书籍数据
-    public List<Book> getBookList(String bookName, int pn, int rn,HttpServletRequest request) {
+    public List<Book> getBookList(String bookName, int pn, int rn, HttpServletRequest request) {
         String sql = "select * from book_tb where book_name like ? limit ?,? ";
         List<Book> list = new ArrayList<Book>();
         try {
@@ -195,12 +195,24 @@ public class BookDao {
 
     // 传入旧书的ID和新书的数据进行修改图书
     public int modifyBook(Book book, int bookId) {
+        int count = 0;
+        BorrowDao borrowDao = new BorrowDao();
         String bookName = book.getBookName();
         String bookAuthor = book.getBookAuthor();
         String bookTpye = book.getBookType();
         String bookISBN = book.getBookISBN();
         String bookPrice = book.getBookPrice();
         String bookBeginNumber = book.getBookBeginNumber();
+
+        for (int borrowUserId : borrowDao.getBorrowByBookId(bookId)) {
+            count++;
+        }
+
+        //判断总数不能小于被借阅数
+        if (count > Integer.parseInt(bookBeginNumber)) {
+            return -1;
+        }
+
         String sql = "UPDATE book_tb "
                 + "SET book_name = '" + bookName + "',"
                 + "book_author ='" + bookAuthor + "',"
@@ -231,7 +243,7 @@ public class BookDao {
             for (int borrowUserId : borrowDao.getBorrowByBookId(bookId)) {
                 count++;
                 if (borrowUserId == account.getId()) {
-                    temp ++;
+                    temp++;
                 }
             }
             String bookNowNumber = String.valueOf(Integer.parseInt(bookBeginNumber) - count);

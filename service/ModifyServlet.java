@@ -51,8 +51,9 @@ public class ModifyServlet extends HttpServlet {
             String modName = request.getParameter("mod_name");
             String modSex = request.getParameter("mod_sex");
             String modPhone = request.getParameter("mod_phone");
+            String modAccount = request.getParameter("mod_account");
             // 进行修改
-            User user = new User(mid, modName, modSex, modPhone);
+            User user = new User(mid, modName, modSex, modPhone,modAccount);
             UserDao userDao = new UserDao();
             // 返回修改结果
             res = userDao.modifyReader(user);

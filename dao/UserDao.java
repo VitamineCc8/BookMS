@@ -147,12 +147,17 @@ public class UserDao {
         String userPhone = user.getUserPhone();
         String userAccount = user.getUserAccount();
 
-        String sql = "UPDATE user_tb "
+        String userSql = "UPDATE user_tb "
                 + "SET user_name = '" + userName + "',"
                 + "user_sex ='" + userSex + "',"
                 + "user_phone = '" + userPhone + "'"
                 + " WHERE user_id = '" + userId + "'";
-        return common.updateSql(sql);
+
+        String accountSql = "UPDATE account_tb "
+                + "SET name = '" + userName + "'"
+                + " WHERE account = '" + userAccount + "'";
+
+        return common.updateSql(userSql, accountSql);
     }
 
     // 根据页数进行获取员工数据
