@@ -1,7 +1,7 @@
 package com.wei.service;
 
+import com.wei.common.Common;
 import com.wei.dao.BorrowDao;
-import com.wei.util.Common;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

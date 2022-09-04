@@ -42,7 +42,6 @@ public class StreamUtils {
 			builder.append(line+"\r\n");
 		}
 		return builder.toString();
-		
 	}
 
 }

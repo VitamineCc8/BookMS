@@ -250,7 +250,7 @@
                         <template slot-scope="scope">
                             <el-tooltip class="item" effect="dark" content="有借阅关系的图书不可删除" placement="left">
                                 <el-button @click="delMessage(scope.row)"
-                                           :disabled="scope.row.borrowByBookId > 0"
+                                           :disabled="scope.row.borrowByBookId > 0 || scope.row.bookBeginNumber - scope.row.borrowByBookId > scope.row.bookNowNumber"
                                            type="text" size="small">删除
                                 </el-button>
                             </el-tooltip>

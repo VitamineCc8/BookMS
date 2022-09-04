@@ -1,7 +1,7 @@
 package com.wei.dao;
 
+import com.wei.common.Common;
 import com.wei.entity.Account;
-import com.wei.util.Common;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

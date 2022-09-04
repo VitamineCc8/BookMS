@@ -1,8 +1,6 @@
 package com.wei;
 
 
-import com.wei.dao.BookDao;
-
 public class TestAll {
 
 	public static void main(String[] args) {

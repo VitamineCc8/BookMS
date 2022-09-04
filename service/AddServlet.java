@@ -1,11 +1,10 @@
 package com.wei.service;
 
-import com.google.gson.Gson;
+import com.wei.common.Common;
 import com.wei.dao.BookDao;
 import com.wei.dao.UserDao;
 import com.wei.entity.Book;
 import com.wei.entity.User;
-import com.wei.util.Common;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -13,7 +12,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 

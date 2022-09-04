@@ -1,7 +1,6 @@
 package com.wei.dao;
 
-import com.wei.entity.Borrow;
-import com.wei.util.Common;
+import com.wei.common.Common;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -73,7 +72,7 @@ public class BorrowDao {
                 + "values('" + userId + "'"
                 + ",'" + bookId + "' )";
         try {
-            conn = com.wei.dao.BaseDao.getConnection();
+            conn = BaseDao.getConnection();
             //关闭数据库的自动提交，自动会开启事务；
             conn.setAutoCommit(false);
             stmt = conn.prepareStatement(sql);
@@ -96,7 +95,7 @@ public class BorrowDao {
             e.printStackTrace();
             return 0;
         } finally {
-            com.wei.dao.BaseDao.closeAll(conn, stmt, rs);
+            BaseDao.closeAll(conn, stmt, rs);
         }
     }
 
@@ -105,7 +104,7 @@ public class BorrowDao {
         String sql = "DELETE FROM  borrow_tb "
                 + "WHERE user_id = '" + userId + "' and book_id = '" + bookId + "'";
         try {
-            conn = com.wei.dao.BaseDao.getConnection();
+            conn = BaseDao.getConnection();
             //关闭数据库的自动提交，自动会开启事务；
             conn.setAutoCommit(false);
             stmt = conn.prepareStatement(sql);
@@ -128,39 +127,7 @@ public class BorrowDao {
             e.printStackTrace();
             return 0;
         } finally {
-            com.wei.dao.BaseDao.closeAll(conn, stmt, rs);
-        }
-    }
-
-    //根据页数进行获取借阅数据
-    public List<Borrow> getReturnList(int pn, int rn) {
-        String sql = "select * from borrow_tb limit ?,?";
-        List<BorrowDao> list = new ArrayList<BorrowDao>();
-        try {
-            conn = BaseDao.getConnection();
-            stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, (pn - 1) * rn);
-            stmt.setInt(2, rn);
-            rs = stmt.executeQuery();
-            return getBorrows();
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return null;
-        } finally {
             BaseDao.closeAll(conn, stmt, rs);
         }
-    }
-
-    //封装借阅数据
-    private List<Borrow> getBorrows() throws SQLException {
-        List<Borrow> list = new ArrayList<Borrow>();
-        while (rs.next()) {
-            int bookId = rs.getInt("book_id");
-            int userId = rs.getInt("user_id");
-            Borrow borrow = new Borrow(userId, bookId);
-            list.add(borrow);
-        }
-        return list;
     }
 }

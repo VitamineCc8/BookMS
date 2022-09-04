@@ -1,12 +1,10 @@
 package com.wei.service;
 
+import com.wei.common.Common;
 import com.wei.dao.BookDao;
-import com.wei.dao.BorrowDao;
 import com.wei.dao.UserDao;
 import com.wei.entity.Book;
-import com.wei.entity.Borrow;
 import com.wei.entity.User;
-import com.wei.util.Common;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

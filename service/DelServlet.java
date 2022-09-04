@@ -1,8 +1,8 @@
 package com.wei.service;
 
+import com.wei.common.Common;
 import com.wei.dao.BookDao;
 import com.wei.dao.UserDao;
-import com.wei.util.Common;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

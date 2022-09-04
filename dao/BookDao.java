@@ -1,9 +1,9 @@
 package com.wei.dao;
 
+import com.wei.common.Common;
+import com.wei.common.Constant;
 import com.wei.entity.Account;
 import com.wei.entity.Book;
-import com.wei.util.Common;
-import com.wei.util.Constant;
 
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Connection;
@@ -112,6 +112,7 @@ public class BookDao {
         }
     }
 
+
     // 根据书名获取书籍数据条数，用于查询时的分页显示
     public int count(String bookName) {
         String sql = "select count(*) num from book_tb where book_name like ?";
@@ -137,26 +138,6 @@ public class BookDao {
             BaseDao.closeAll(conn, stmt, rs);
         }
     }
-
-//    // 获取所有书籍数据
-//    public List<Book> getBookList() {
-//        String sql = "select * from book_tb ";
-//        List<Book> list = new ArrayList<Book>();
-//
-//        try {
-//            //通过公共类得到连接对象
-//            conn = BaseDao.getConnection();
-//            stmt = conn.prepareStatement(sql);
-//            rs = stmt.executeQuery();
-//            return getBooks(request);
-//        } catch (SQLException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//            return null;
-//        } finally {
-//            BaseDao.closeAll(conn, stmt, rs);
-//        }
-//    }
 
     // 添加图书，传入Book对象
     public int addBook(Book book) {
@@ -229,6 +210,7 @@ public class BookDao {
     private List<Book> getBooks(HttpServletRequest request) throws SQLException {
         List<Book> list = new ArrayList<Book>();
         BorrowDao borrowDao = new BorrowDao();
+        Book book;
         Account account = (Account) request.getSession().getAttribute(Constant.USER_SESSION);
         while (rs.next()) {
             int temp = 0;
@@ -248,12 +230,11 @@ public class BookDao {
             }
             String bookNowNumber = String.valueOf(Integer.parseInt(bookBeginNumber) - count);
             if (temp > 0) {
-                Book book = new Book(bookId, temp, bookName, bookAuthor, bookTpye, bookISBN, bookPrice, bookBeginNumber, bookNowNumber);
-                list.add(book);
+                book = new Book(bookId, temp, bookName, bookAuthor, bookTpye, bookISBN, bookPrice, bookBeginNumber, bookNowNumber);
             } else {
-                Book book = new Book(bookId, 0, bookName, bookAuthor, bookTpye, bookISBN, bookPrice, bookBeginNumber, bookNowNumber);
-                list.add(book);
+                book = new Book(bookId, 0, bookName, bookAuthor, bookTpye, bookISBN, bookPrice, bookBeginNumber, bookNowNumber);
             }
+            list.add(book);
         }
         return list;
     }

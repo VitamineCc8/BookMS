@@ -2,8 +2,6 @@ package com.wei.entity;
 
 import lombok.*;
 
-import java.util.List;
-
 @Getter
 @Setter
 @ToString
